@@ -1,0 +1,29 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/screen_bg" android:orientation="vertical" android:padding="48dp" android:paddingTop="28dp">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="56dp" android:orientation="horizontal" android:gravity="center_vertical">
+        <ImageButton android:id="@+id/settingsBack" android:layout_width="42dp" android:layout_height="42dp" android:layout_marginEnd="18dp" android:background="@drawable/focus_tile" android:padding="11dp" android:src="@drawable/ic_up" android:contentDescription="@string/back"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/settings" android:textSize="28sp" android:fontFamily="sans-serif-medium" android:textColor="@color/text_white"/>
+    </LinearLayout>
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"><LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="28dp" android:background="@drawable/card_bg" android:padding="24dp" android:orientation="vertical">
+        <TextView style="@style/SectionTitle" android:text="@string/default_player"/>
+        <TextView android:id="@+id/currentPlayer" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:textSize="22sp" android:textColor="@color/text_white"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="@string/default_player_hint" android:textSize="14sp" android:textColor="@color/text_dim"/>
+        <Button android:id="@+id/chooseDefaultPlayer" style="@style/ActionButton" android:layout_width="wrap_content" android:layout_height="44dp" android:layout_marginTop="22dp" android:text="@string/choose_player"/>
+    </LinearLayout>
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="22dp" android:text="@string/external_progress_hint" android:textSize="13sp" android:textColor="@color/text_mid"/>
+    <TextView style="@style/SectionTitle" android:layout_marginTop="24dp" android:text="Сортировка"/>
+    <Button android:id="@+id/sortField" style="@style/ActionButton" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="12dp"/>
+    <Button android:id="@+id/sortDirection" style="@style/ActionButton" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="8dp"/>
+    <Button android:id="@+id/sortFolders" style="@style/ActionButton" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="8dp"/>
+    <TextView style="@style/SectionTitle" android:layout_marginTop="28dp" android:text="Встроенный плеер"/>
+    <Button android:id="@+id/audioLanguage" style="@style/ActionButton" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="8dp"/>
+    <Button android:id="@+id/subtitleLanguage" style="@style/ActionButton" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="8dp"/>
+    <Button android:id="@+id/subtitleSize" style="@style/ActionButton" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="8dp"/>
+    <Button android:id="@+id/subtitleStyle" style="@style/ActionButton" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="8dp"/>
+    <Button android:id="@+id/seekStep" style="@style/ActionButton" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="8dp"/>
+    <Button android:id="@+id/aspectMode" style="@style/ActionButton" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="8dp"/>
+    <Button android:id="@+id/networkBuffer" style="@style/ActionButton" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="8dp"/>
+    <Button android:id="@+id/frameMatching" style="@style/ActionButton" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="8dp"/>
+    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:text="Частота подстраивается только в пределах текущего разрешения, если телевизор поддерживает подходящий режим. При смене режима возможно краткое затемнение." android:textSize="12sp" android:textColor="@color/text_dim"/>
+    </LinearLayout></ScrollView>
+</LinearLayout>

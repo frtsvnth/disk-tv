@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="ru">
+    <string name="app_name">Диск ТВ</string>
+    <string name="discovering">Ищет диски в сети…</string>
+    <string name="no_servers">Диски не найдены</string>
+    <string name="try_again">Попробовать снова</string>
+    <string name="server">Диск</string>
+    <string name="folder">Папка</string>
+    <string name="file">Файл</string>
+    <string name="up_one">На уровень выше</string>
+    <string name="back">Назад</string>
+    <string name="play">Воспроизвести</string>
+    <string name="resume">Продолжить с места остановки</string>
+    <string name="recent_folders">Последние папки</string>
+    <string name="no_recent">Пока нет последних папок</string>
+    <string name="connecting">Подключение…</string>
+    <string name="browsing">Чтение папки…</string>
+    <string name="error_title">Ошибка</string>
+    <string name="error_network">Не удалось подключиться к диску</string>
+    <string name="error_play">Не удалось запустить воспроизведение</string>
+    <string name="ok">ОК</string>
+    <string name="resume_label">Продолжить с места остановки</string>
+    <string name="start_over">Начать сначала</string>
+    <string name="empty_folder">Папка пуста</string>
+    <string name="unsupported_file">Нет доступного видео для воспроизведения</string>
+    <string name="progress_at">Остановились на %1$s</string>
+    <string name="resume_body">%1$s\nПродолжить с %2$s?</string>
+    <string name="home_subtitle">Фильмы с вашего диска</string>
+    <string name="network_drives">Диски в сети</string>
+    <string name="refresh">Обновить</string>
+    <string name="search_short">Поиск…</string>
+    <string name="open">Открыть</string>
+    <string name="local_disk">ЛОКАЛЬНАЯ СЕТЬ</string>
+    <string name="recent_empty_hint">Открытые папки появятся здесь — к ним можно будет быстро вернуться.</string>
+    <string name="home_remote_hint">ОК — открыть    ·    Стрелки — выбрать</string>
+    <string name="network_idle">Локальная сеть</string>
+    <string name="resume_question">Продолжить просмотр?</string>
+    <string name="stopped_at">Место остановки</string>
+    <string name="continue_action">Продолжить</string>
+    <string name="video">Видео</string>
+    <plurals name="server_count"><item quantity="one">%d диск доступен</item><item quantity="few">%d диска доступны</item><item quantity="many">%d дисков доступны</item><item quantity="other">%d диска доступны</item></plurals>
+    <plurals name="file_count"><item quantity="one">%d файл</item><item quantity="few">%d файла</item><item quantity="many">%d файлов</item><item quantity="other">%d файла</item></plurals>
+    <plurals name="folder_count"><item quantity="one">%d папка</item><item quantity="few">%d папки</item><item quantity="many">%d папок</item><item quantity="other">%d папки</item></plurals>
+    <string name="browse_retry">Не удалось открыть папку.\nНажмите ОК, чтобы попробовать ещё раз.</string>
+    <string name="settings">Настройки</string>
+    <string name="default_player">Плеер по умолчанию</string>
+    <string name="choose_player">Выбрать плеер</string>
+    <string name="open_with_player">Открыть в плеере</string>
+    <string name="internal_player">Встроенный плеер</string>
+    <string name="internal_player_detail">Диск ТВ · сохраняет место остановки</string>
+    <string name="external_player_detail">Установлен в Android</string>
+    <string name="compatible_players">Плееры для сетевого видео</string>
+    <string name="remember_player">Использовать по умолчанию</string>
+    <string name="selected_player">Выбран</string>
+    <string name="unavailable_player">Плеер недоступен</string>
+    <string name="player_unavailable_hint">Этот плеер не может открыть файл. Выберите другой.</string>
+    <string name="default_player_hint">Обычное нажатие ОК запускает выбранный плеер. Удерживайте ОК на видео, чтобы открыть его в другом.</string>
+    <string name="external_progress_hint">Внешние плееры сохраняют позицию просмотра по своим правилам. Прогресс встроенного плеера остаётся в «Диск ТВ».</string>
+    <string name="browser_remote_hint">ОК — открыть    ·    Удерживайте ОК на видео — выбрать плеер</string>
+</resources>

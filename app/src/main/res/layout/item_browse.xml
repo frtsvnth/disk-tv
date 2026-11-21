@@ -1,0 +1,10 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="72dp" android:layout_marginBottom="5dp" android:focusable="true" android:clickable="true" android:orientation="horizontal" android:gravity="center_vertical" android:padding="12dp" android:background="@drawable/focus_tile">
+    <ImageView android:id="@+id/itemIcon" android:layout_width="40dp" android:layout_height="40dp" android:padding="9dp" android:background="@drawable/icon_well" android:src="@drawable/ic_folder" android:contentDescription="@null"/>
+    <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="14dp" android:layout_marginEnd="20dp" android:orientation="vertical">
+        <TextView android:id="@+id/itemTitle" style="@style/ItemTitle"/>
+        <TextView android:id="@+id/itemSubtitle" style="@style/ItemSubtitle" android:layout_marginTop="5dp"/>
+        <ProgressBar android:id="@+id/itemProgress" style="?android:attr/progressBarStyleHorizontal" android:layout_width="match_parent" android:layout_height="2dp" android:layout_marginTop="6dp" android:progressTint="#C7D0DE" android:progressBackgroundTint="#363E4A" android:max="1000" android:visibility="gone"/>
+    </LinearLayout>
+    <TextView android:id="@+id/itemStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="12dp" android:textColor="#E0E6EF" android:fontFamily="sans-serif-medium" android:textSize="12sp" android:paddingStart="10dp" android:paddingEnd="10dp" android:paddingTop="6dp" android:paddingBottom="6dp" android:background="@drawable/status_pill" android:visibility="gone"/>
+    <ImageView android:id="@+id/itemArrow" android:layout_width="18dp" android:layout_height="18dp" android:src="@drawable/ic_chevron" android:contentDescription="@null"/>
+</LinearLayout>

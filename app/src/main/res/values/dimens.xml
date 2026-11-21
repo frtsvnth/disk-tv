@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="screen_padding">56dp</dimen>
+    <dimen name="section_title_top">24dp</dimen>
+    <dimen name="section_gap">16dp</dimen>
+    <dimen name="tile_corner">16dp</dimen>
+    <dimen name="glass_corner">20dp</dimen>
+    <dimen name="pill_corner">21dp</dimen>
+    <dimen name="tile_size">260dp</dimen>
+    <dimen name="tile_height">300dp</dimen>
+    <dimen name="item_height">72dp</dimen>
+    <dimen name="header_height">60dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_normal">16dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
+</resources>

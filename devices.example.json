@@ -1,0 +1,7 @@
+{
+  "package": "ru.tuvio.tools.dlnaclient",
+  "apk": "app/build/outputs/apk/release/app-release.apk",
+  "devices": [
+    {"name": "Android TV", "adb_serial": "YOUR_TV_ADDRESS:5555", "expected_model": "YOUR_TV_MODEL"}
+  ]
+}

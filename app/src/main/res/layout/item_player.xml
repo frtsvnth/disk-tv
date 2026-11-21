@@ -1,0 +1,8 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="64dp" android:layout_marginBottom="5dp" android:orientation="horizontal" android:gravity="center_vertical" android:padding="12dp" android:focusable="true" android:clickable="true" android:background="@drawable/focus_tile">
+    <ImageView android:id="@+id/playerIcon" android:layout_width="36dp" android:layout_height="36dp" android:contentDescription="@null"/>
+    <LinearLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="14dp" android:layout_marginEnd="12dp" android:orientation="vertical">
+        <TextView android:id="@+id/playerName" style="@style/ItemTitle"/>
+        <TextView android:id="@+id/playerDetail" style="@style/ItemSubtitle" android:layout_marginTop="5dp"/>
+    </LinearLayout>
+    <TextView android:id="@+id/playerSelected" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/selected_player" android:textColor="@color/text_dim" android:textSize="12sp"/>
+</LinearLayout>
