@@ -25,7 +25,7 @@
     <string name="unsupported_file">Нет доступного видео для воспроизведения</string>
     <string name="progress_at">Остановились на %1$s</string>
     <string name="resume_body">%1$s\nПродолжить с %2$s?</string>
-    <string name="home_headline">Фильмы с вашего <font color="#A5C9FF">диска.</font></string>
+    <string name="home_subtitle">Фильмы с вашего диска</string>
     <string name="network_drives">Диски в сети</string>
     <string name="refresh">Обновить</string>
     <string name="search_short">Поиск…</string>
