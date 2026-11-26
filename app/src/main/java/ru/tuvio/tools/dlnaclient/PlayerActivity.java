@@ -22,6 +22,8 @@ public class PlayerActivity extends AppCompatActivity {
  private FineTimeBar progressBar;
  private View playbackRows, playerChrome, bottomBar, controlsScrim;
  private boolean expandedPanel;
+ private boolean playbackFeedbackEnabled;
+ private TextView seekTime, playbackStatus;
  private static final int COMPACT_TIMEOUT_MS = 5000;
  private PlaybackPreferences prefs;
  private ResumeStore store;
@@ -34,6 +36,11 @@ public class PlayerActivity extends AppCompatActivity {
  private PlaybackChoiceRow audioRow, captionRow, speedRow;
  private static final float[] SPEEDS = {0.5f, 0.75f, 1f, 1.25f, 1.5f, 2f};
  private final Handler handler=new Handler(Looper.getMainLooper());
+ private final Runnable hideSeekTime = () -> {
+  seekTime.setVisibility(View.GONE);
+  updateSubtitlePadding();
+ };
+ private final Runnable hidePlaybackStatus = () -> playbackStatus.setVisibility(View.GONE);
  private final Runnable saver=new Runnable(){@Override public void run(){savePosition();handler.postDelayed(this,5000);}};
  @Override protected void onCreate(Bundle state){
   super.onCreate(state);setContentView(R.layout.activity_player);
@@ -46,6 +53,19 @@ public class PlayerActivity extends AppCompatActivity {
   playerView=findViewById(R.id.playerView);
   progressBar = playerView.findViewById(androidx.media3.ui.R.id.exo_progress);
   progressBar.setBaseIncrement(prefs.seekMs());
+  seekTime = findViewById(R.id.seekTime);
+  playbackStatus = findViewById(R.id.playbackStatus);
+  progressBar.addListener(new TimeBar.OnScrubListener() {
+   @Override public void onScrubStart(TimeBar bar, long target) { showSeekTime(target); }
+   @Override public void onScrubMove(TimeBar bar, long target) { showSeekTime(target); }
+   @Override public void onScrubStop(TimeBar bar, long target, boolean canceled) {
+    if (canceled) hideSeekTime.run();
+    else {
+     showSeekTime(target);
+     handler.postDelayed(hideSeekTime, 1500);
+    }
+   }
+  });
   audioRow = findViewById(R.id.audioRow);
   captionRow = findViewById(R.id.captionRow);
   speedRow = findViewById(R.id.speedRow);
@@ -74,6 +94,24 @@ public class PlayerActivity extends AppCompatActivity {
   playerView.requestFocus();
  }
 
+ private void showSeekTime(long target) {
+  if (player == null) return;
+  handler.removeCallbacks(hideSeekTime);
+  long duration = player.getDuration();
+  seekTime.setText(duration > 0
+    ? getString(R.string.seek_time_total, Ui.time(target), Ui.time(duration))
+    : Ui.time(target));
+  seekTime.setVisibility(View.VISIBLE);
+  updateSubtitlePadding();
+ }
+
+ private void showPlaybackStatus(boolean playing) {
+  handler.removeCallbacks(hidePlaybackStatus);
+  playbackStatus.setText(playing ? R.string.playback_resumed : R.string.playback_paused);
+  playbackStatus.setVisibility(View.VISIBLE);
+  if (playing) handler.postDelayed(hidePlaybackStatus, 1250);
+ }
+
  private void renderPanel(boolean controlsVisible) {
   boolean showRows = controlsVisible && expandedPanel;
   playbackRows.setVisibility(showRows ? View.VISIBLE : View.GONE);
@@ -88,12 +126,26 @@ public class PlayerActivity extends AppCompatActivity {
    layout.bottomMargin = margin;
    progressBar.setLayoutParams(layout);
   }
-  SubtitleView subtitles = playerView.getSubtitleView();
-  if (subtitles != null) {
-   int height = Math.max(playerView.getHeight(), getResources().getDisplayMetrics().heightPixels);
-   float padding = controlsVisible ? Math.max(0.08f, Math.min(0.6f, (margin + Ui.dp(this, 18)) / (float) height)) : 0.08f;
-   subtitles.setBottomPaddingFraction(padding);
+  FrameLayout.LayoutParams seekLayout = (FrameLayout.LayoutParams) seekTime.getLayoutParams();
+  int seekMargin = margin + Ui.dp(this, 34);
+  if (seekLayout.bottomMargin != seekMargin) {
+   seekLayout.bottomMargin = seekMargin;
+   seekTime.setLayoutParams(seekLayout);
   }
+  if (!controlsVisible) seekTime.setVisibility(View.GONE);
+  updateSubtitlePadding();
+ }
+
+ private void updateSubtitlePadding() {
+  SubtitleView subtitles = playerView.getSubtitleView();
+  if (subtitles == null) return;
+  int height = Math.max(playerView.getHeight(), getResources().getDisplayMetrics().heightPixels);
+  boolean controlsVisible = playerView.isControllerFullyVisible();
+  int margin = getResources().getDimensionPixelSize(expandedPanel
+    ? R.dimen.player_expanded_timeline_margin : R.dimen.player_compact_timeline_margin);
+  int clearance = seekTime.getVisibility() == View.VISIBLE ? 84 : 18;
+  float padding = controlsVisible ? Math.max(0.08f, Math.min(0.65f, (margin + Ui.dp(this, clearance)) / (float) height)) : 0.08f;
+  subtitles.setBottomPaddingFraction(padding);
  }
 
  private void expandPanel() {
@@ -132,6 +184,11 @@ public class PlayerActivity extends AppCompatActivity {
     if(state==Player.STATE_READY){ready=true;if(completed&&player.getCurrentPosition()<player.getDuration()-1000)completed=false;matchFrameRate();}
     if(state==Player.STATE_ENDED){completed=true;store.setWatched(server.udn,item.objectId,true);}
    }
+   @Override public void onPlayWhenReadyChanged(boolean playing, int reason) {
+    if (playbackFeedbackEnabled && reason == Player.PLAY_WHEN_READY_CHANGE_REASON_USER_REQUEST) {
+     showPlaybackStatus(playing);
+    }
+   }
    @Override public void onPlaybackParametersChanged(PlaybackParameters parameters){prefs.set("speed",Float.toString(parameters.speed)); updateSpeedRow();}
    @Override public void onTracksChanged(Tracks tracks){restoreTrack(C.TRACK_TYPE_AUDIO); restoreTrack(C.TRACK_TYPE_TEXT); updateForcedSubtitles(tracks); updatePlaybackRows();}
    @Override public void onVideoSizeChanged(VideoSize size){matchFrameRate();}
@@ -147,6 +204,8 @@ public class PlayerActivity extends AppCompatActivity {
   }
   media.setSubtitleConfigurations(subtitles);
   player.setMediaItem(media.build());player.seekTo(position);player.prepare();player.setPlayWhenReady(playWhenReady&&!completed);
+  playbackFeedbackEnabled = true;
+  if (!playWhenReady && !completed) showPlaybackStatus(false);
   collapsePanel();
   handler.postDelayed(saver,5000);
  }
@@ -334,10 +393,13 @@ public class PlayerActivity extends AppCompatActivity {
   if(selected>=0&&selected!=currentIndex){WindowManager.LayoutParams params=getWindow().getAttributes();params.preferredDisplayModeId=modes.get(selected).getModeId();getWindow().setAttributes(params);}
  }
  private void savePosition(){if(player!=null&&ready&&!completed)store.save(server.udn,item.objectId,item.title,item.url,player.getCurrentPosition(),player.getDuration());}
- @Override protected void onPause(){if(player!=null){savePosition();playWhenReady=player.getPlayWhenReady();player.pause();}super.onPause();}
- @Override protected void onResume(){super.onResume();if(player!=null)player.setPlayWhenReady(playWhenReady&&!completed);}
+ @Override protected void onPause(){playbackFeedbackEnabled=false;if(player!=null){savePosition();playWhenReady=player.getPlayWhenReady();player.pause();}super.onPause();}
+ @Override protected void onResume(){super.onResume();if(player!=null)player.setPlayWhenReady(playWhenReady&&!completed);playbackFeedbackEnabled=true;}
  @Override protected void onStop(){
-  handler.removeCallbacks(saver);if(player!=null){savePosition();position=player.getCurrentPosition();playerView.setPlayer(null);player.release();player=null;ready=false;}
+  handler.removeCallbacks(saver);handler.removeCallbacks(hideSeekTime);handler.removeCallbacks(hidePlaybackStatus);
+  if (seekTime != null) hideSeekTime.run();
+  if (playbackStatus != null) hidePlaybackStatus.run();
+  if(player!=null){savePosition();position=player.getCurrentPosition();playerView.setPlayer(null);player.release();player=null;ready=false;}
   WindowManager.LayoutParams params=getWindow().getAttributes();params.preferredDisplayModeId=originalDisplayMode;getWindow().setAttributes(params);super.onStop();
  }
  @Override protected void onDestroy(){if(dialog!=null)dialog.dismiss();super.onDestroy();}
@@ -372,6 +434,10 @@ public class PlayerActivity extends AppCompatActivity {
     else collapsePanel();
     return true;
    }
+   if (!expandedPanel && key == KeyEvent.KEYCODE_DPAD_UP) {
+    if (event.getRepeatCount() == 0) collapsePanel();
+    return true;
+   }
    if (!expandedPanel && (key == KeyEvent.KEYCODE_DPAD_LEFT || key == KeyEvent.KEYCODE_DPAD_RIGHT)) {
     if (!playerView.isControllerFullyVisible() || focus != progressBar) collapsePanel();
     if (progressBar.isFocused()) {
@@ -392,6 +458,6 @@ public class PlayerActivity extends AppCompatActivity {
     return true;
    }
   }
-  return super.dispatchKeyEvent(event);
+  return playerView.dispatchMediaKeyEvent(event) || super.dispatchKeyEvent(event);
  }
 }

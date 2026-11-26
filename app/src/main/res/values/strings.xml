@@ -76,4 +76,7 @@
     <string name="launcher_name">Диск ТВ</string>
     <string name="migration_action">Перейти на новый «Диск ТВ»</string>
     <string name="migration_ready">История и настройки перенесены</string>
+    <string name="seek_time_total">%1$s / %2$s</string>
+    <string name="playback_paused">Ⅱ  Пауза</string>
+    <string name="playback_resumed">▶  Воспроизведение</string>
 </resources>
