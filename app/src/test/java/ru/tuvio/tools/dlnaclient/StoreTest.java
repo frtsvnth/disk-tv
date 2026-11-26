@@ -27,6 +27,15 @@ public class StoreTest {
         reopened.setWatched("nas", "42", false);
         assertFalse(store.isWatched("nas", "42"));
     }
+    @Test public void migrationPreservesExistingValuesAndCopiesTypedSettings() throws Exception {
+        prefs.edit().putString("audio_language", "en").apply();
+        org.json.JSONObject old = new org.json.JSONObject()
+                .put("audio_language", "ru").put("subtitle_size", 34).put("frame_match", true);
+        assertTrue(MigrationData.mergeMissing(prefs, old));
+        assertEquals("en", prefs.getString("audio_language", ""));
+        assertEquals(34, prefs.getInt("subtitle_size", 0));
+        assertTrue(prefs.getBoolean("frame_match", false));
+    }
     @Test public void unknownDurationAllowsResumeAndNearEndDoesNot() {
         assertTrue(new ResumeStore.ResumeEntry("", "", 10000, -1).hasResume());
         assertFalse(new ResumeStore.ResumeEntry("", "", 98000, 100000).hasResume());

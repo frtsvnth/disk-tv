@@ -7,11 +7,27 @@ android {
     compileSdk 34
 
     defaultConfig {
-        applicationId 'ru.tuvio.tools.dlnaclient'
+        applicationId 'io.frtsvnth.disktv'
         minSdk 26
         targetSdk 34
-        versionCode 7
-        versionName '1.4.1'
+        versionCode 8
+        versionName '1.5.0'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    flavorDimensions += 'distribution'
+    productFlavors {
+        current {
+            dimension 'distribution'
+        }
+        legacy {
+            dimension 'distribution'
+            applicationId 'ru.tuvio.tools.dlnaclient'
+            resValue 'string', 'launcher_name', 'Диск ТВ (старая версия)'
+        }
     }
 
     signingConfigs {

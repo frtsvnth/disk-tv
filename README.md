@@ -14,7 +14,7 @@
 [![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-3DDC84)](app/build.gradle)
 [![MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-**[Скачать APK последней версии](https://github.com/frtsvnth/disk-tv/releases/latest/download/DiskTV.apk)** ·
+**[Скачать APK последней версии](https://github.com/frtsvnth/disk-tv/releases/latest/download/DiskTV-New.apk)** ·
 [Все релизы](https://github.com/frtsvnth/disk-tv/releases) ·
 [Сообщить о проблеме](https://github.com/frtsvnth/disk-tv/issues)
 
@@ -41,7 +41,7 @@
 для 32- и 64-битных устройств. Телевизор и DLNA-сервер должны видеть друг друга
 в локальной сети.
 
-1. Скачайте `DiskTV.apk` из [Releases](https://github.com/frtsvnth/disk-tv/releases/latest).
+1. Скачайте `DiskTV-New.apk` из [Releases](https://github.com/frtsvnth/disk-tv/releases/latest).
 2. Передайте APK на телевизор и откройте установщиком.
 3. При необходимости разрешите установку из выбранного файлового менеджера.
 4. Найдите «Диск ТВ» среди приложений и откройте свой сетевой диск.
@@ -50,8 +50,8 @@
 
 ```sh
 adb connect TV_ADDRESS:5555
-adb -s TV_ADDRESS:5555 install -r DiskTV.apk
-adb -s TV_ADDRESS:5555 shell am start -n ru.tuvio.tools.dlnaclient/.MainActivity
+adb -s TV_ADDRESS:5555 install -r DiskTV-New.apk
+adb -s TV_ADDRESS:5555 shell am start -n io.frtsvnth.disktv/ru.tuvio.tools.dlnaclient.MainActivity
 ```
 
 Для каждого релиза доступен `SHA256SUMS.txt` с контрольной суммой APK.
@@ -65,19 +65,28 @@ adb -s TV_ADDRESS:5555 shell am start -n ru.tuvio.tools.dlnaclient/.MainActivity
 установку из «Диск ТВ». Обновление поверх старой версии сохраняет настройки и
 историю. Кнопка «Позже» откладывает повторное предложение этой версии на сутки.
 
-Для выпуска увеличьте `versionCode`, соберите APK с тем же ключом подписи и
-переименуйте его в `DiskTV.apk`. В каталоге с готовыми файлами выполните:
+Пакет с версии 1.5.0 называется `io.frtsvnth.disktv`. Android устанавливает его
+рядом со старым пакетом. Если приложение уже установлено, сначала обновите его
+обычным способом, затем в настройках нажмите «Перейти на новый „Диск ТВ“».
+После установки откройте новый «Диск ТВ». История, последние папки, настройки
+сортировки и плееров переносятся локально при первом открытии. Старый пакет
+показывается как «Диск ТВ (старая версия)». Его можно удалить после проверки переноса.
+
+Для выпуска увеличьте `versionCode` и соберите оба варианта с прежним ключом.
+Переименуйте `app-current-release.apk` в `DiskTV-New.apk`, а
+`app-legacy-release.apk` в `DiskTV.apk`. В каталоге с готовыми файлами выполните:
 
 ```sh
-python3 /path/to/disk-tv/tools/update_manifest.py DiskTV.apk \
-  --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" > update.json
-shasum -a 256 DiskTV.apk > SHA256SUMS.txt
-gh release create vX.Y.Z DiskTV.apk update.json SHA256SUMS.txt --notes-file release-notes.md
+python3 /path/to/disk-tv/tools/update_manifest.py DiskTV-New.apk --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" > update-new.json
+python3 /path/to/disk-tv/tools/update_manifest.py DiskTV.apk --aapt "$ANDROID_HOME/build-tools/34.0.0/aapt" > update.json
+shasum -a 256 DiskTV-New.apk DiskTV.apk > SHA256SUMS.txt
+gh release create vX.Y.Z DiskTV-New.apk update-new.json DiskTV.apk update.json SHA256SUMS.txt --notes-file release-notes.md
 ```
 
-Вместо `vX.Y.Z` укажите тег, соответствующий `versionName` APK. Все три файла
-должны быть вложениями одного стабильного релиза. Приложение сверяет размер и
-SHA-256 загрузки, номер сборки, имя пакета и подпись перед запуском установщика.
+Тег должен соответствовать `versionName` обоих APK. Публикуйте оба варианта в
+одном стабильном релизе, чтобы владельцы прежнего пакета могли перейти без потери
+истории. Перед запуском установщика приложение сверяет размер, SHA-256,
+номер сборки, имя пакета и подпись.
 
 ## Управление и плееры
 
@@ -161,10 +170,10 @@ git clone https://github.com/frtsvnth/disk-tv.git
 cd disk-tv
 
 # Укажите ANDROID_HOME либо sdk.dir в локальном local.properties.
-./gradlew assembleDebug testDebugUnitTest lintDebug
+./gradlew assembleCurrentDebug testCurrentDebugUnitTest lintCurrentDebug
 ```
 
-Результат: `app/build/outputs/apk/debug/app-debug.apk`.
+Результат: `app/build/outputs/apk/current/debug/app-current-debug.apk`.
 На Windows используйте `gradlew.bat`. В GitHub Actions выполняются те же сборка,
 тесты и Android Lint; APK и отчёты сохраняются как артефакты запуска.
 
@@ -177,10 +186,10 @@ export DISKTV_KEYSTORE=/absolute/path/to/private-release.jks
 export DISKTV_KEYSTORE_PASSWORD='your-store-password'
 export DISKTV_KEY_ALIAS='your-key-alias'
 export DISKTV_KEY_PASSWORD='your-key-password'
-./gradlew assembleRelease
+./gradlew assembleCurrentRelease assembleLegacyRelease
 ```
 
-APK появится в `app/build/outputs/apk/release/`. Без этих переменных release-сборка
+APK появятся в `app/build/outputs/apk/current/release/` и `app/build/outputs/apk/legacy/release/`. Без этих переменных release-сборка
 будет неподписанной. Для обновления уже установленного APK нужен тот же ключ
 подписи; debug- и собственные release-сборки могут использовать разные ключи.
 

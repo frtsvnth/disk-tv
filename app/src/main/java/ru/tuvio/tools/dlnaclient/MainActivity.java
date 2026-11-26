@@ -67,6 +67,12 @@ public class MainActivity extends AppCompatActivity implements Discovery.Callbac
         discovery = new Discovery(this, this);
         startDiscovery();
         loadRecents();
+        MigrationData.importOnStart(this, () -> {
+            if (isFinishing() || isDestroyed()) return;
+            loadRecents();
+            recentAdapter.notifyDataSetChanged();
+            Toast.makeText(this, R.string.migration_ready, Toast.LENGTH_SHORT).show();
+        });
     }
 
     @Override

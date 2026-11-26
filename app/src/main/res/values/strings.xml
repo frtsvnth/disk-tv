@@ -74,4 +74,7 @@
     <string name="update_downloading">Скачиваем обновление…</string>
     <string name="update_download_error">Не удалось скачать или проверить обновление.</string>
     <string name="update_installer_error">Android не смог открыть установщик.</string>
+    <string name="launcher_name">Диск ТВ</string>
+    <string name="migration_action">Перейти на новый «Диск ТВ»</string>
+    <string name="migration_ready">История и настройки перенесены</string>
 </resources>

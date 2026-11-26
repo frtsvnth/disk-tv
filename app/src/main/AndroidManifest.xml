@@ -12,13 +12,18 @@
     <!-- Needed to send/receive SSDP multicast for DLNA discovery. -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 
+    <permission android:name="${applicationId}.migrationRead" android:protectionLevel="signature" />
+    <uses-permission android:name="ru.tuvio.tools.dlnaclient.migrationRead" />
+
     <queries>
+        <package android:name="ru.tuvio.tools.dlnaclient" />
+        <package android:name="io.frtsvnth.disktv" />
         <intent><action android:name="android.intent.action.VIEW"/><data android:scheme="http" android:mimeType="video/*"/></intent>
         <intent><action android:name="android.intent.action.VIEW"/><data android:scheme="https" android:mimeType="video/*"/></intent>
     </queries>
 
     <application
-        android:label="@string/app_name"
+        android:label="@string/launcher_name"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:banner="@drawable/tv_banner"
@@ -34,6 +39,12 @@
             <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/update_paths" />
         </provider>
+
+        <provider
+            android:name=".MigrationProvider"
+            android:authorities="${applicationId}.migration"
+            android:exported="true"
+            android:readPermission="${applicationId}.migrationRead" />
 
         <activity
             android:name=".MainActivity"

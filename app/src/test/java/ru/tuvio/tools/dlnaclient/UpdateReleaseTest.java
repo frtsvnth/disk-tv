@@ -22,6 +22,14 @@ public class UpdateReleaseTest {
         assertEquals(manifest().getString("apkUrl"), update.apkUrl());
     }
 
+    @Test public void selectsTheCorrectAssetForEachPackage() throws Exception {
+        String newAsset = "https://github.com/frtsvnth/disk-tv/releases/download/v1.4.0/DiskTV-New.apk";
+        JSONObject current = manifest().put("apkUrl", newAsset);
+        assertEquals(newAsset, UpdateRelease.parse(current.toString(), false).apkUrl());
+        assertThrows(JSONException.class, () -> UpdateRelease.parse(current.toString(), true));
+        assertThrows(JSONException.class, () -> UpdateRelease.parse(manifest().toString(), false));
+    }
+
     @Test public void rejectsForeignAssetAndInvalidHashOrSize() throws Exception {
         assertThrows(JSONException.class, () -> UpdateRelease.parse(
                 manifest().put("apkUrl", "https://example.invalid/DiskTV.apk").toString()));

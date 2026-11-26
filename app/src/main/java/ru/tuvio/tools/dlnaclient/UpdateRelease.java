@@ -8,15 +8,19 @@ import org.json.JSONObject;
 
 final class UpdateRelease {
     private static final String RELEASES = "https://github.com/frtsvnth/disk-tv/releases/";
-    static final String LATEST = RELEASES + "latest/download/update.json";
+    static String manifestUrl(boolean legacy) {
+        return RELEASES + "latest/download/" + (legacy ? "update.json" : "update-new.json");
+    }
     static final long MAX_APK_BYTES = 64L * 1024 * 1024;
 
+    final boolean legacy;
     final long versionCode;
     final String versionName;
     final long size;
     final String sha256;
 
-    private UpdateRelease(long versionCode, String versionName, long size, String sha256) {
+    private UpdateRelease(boolean legacy, long versionCode, String versionName, long size, String sha256) {
+        this.legacy = legacy;
         this.versionCode = versionCode;
         this.versionName = versionName;
         this.size = size;
@@ -24,6 +28,10 @@ final class UpdateRelease {
     }
 
     static UpdateRelease parse(String json) throws JSONException {
+        return parse(json, true);
+    }
+
+    static UpdateRelease parse(String json, boolean legacy) throws JSONException {
         JSONObject value = new JSONObject(json);
         long code = value.getLong("versionCode");
         String name = value.getString("versionName");
@@ -34,7 +42,7 @@ final class UpdateRelease {
                 || !hash.matches("[a-f0-9]{64}")) {
             throw new JSONException("Invalid update metadata");
         }
-        UpdateRelease release = new UpdateRelease(code, name, size, hash);
+        UpdateRelease release = new UpdateRelease(legacy, code, name, size, hash);
         if (!release.apkUrl().equals(value.getString("apkUrl"))) {
             throw new JSONException("Unexpected update URL");
         }
@@ -42,7 +50,7 @@ final class UpdateRelease {
     }
 
     String apkUrl() {
-        return RELEASES + "download/v" + versionName + "/DiskTV.apk";
+        return RELEASES + "download/v" + versionName + (legacy ? "/DiskTV.apk" : "/DiskTV-New.apk");
     }
 
     static void requireTrustedUrl(URL url) throws IOException {

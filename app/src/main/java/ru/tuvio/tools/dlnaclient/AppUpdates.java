@@ -39,7 +39,7 @@ final class AppUpdates {
         if (manual) toast(R.string.update_checking);
         WORKER.execute(() -> {
             try {
-                UpdateRelease release = UpdateClient.latest();
+                UpdateRelease release = UpdateClient.latest(MigrationData.isLegacy());
                 long installed = installedVersion();
                 activity.runOnUiThread(() -> {
                     busy = false;
@@ -55,6 +55,33 @@ final class AppUpdates {
                 activity.runOnUiThread(() -> {
                     busy = false;
                     if (manual && active()) toast(R.string.update_check_error);
+                });
+            }
+        });
+    }
+
+    void migrate() {
+        if (busy || !MigrationData.isLegacy()) return;
+        Intent open = activity.getPackageManager().getLeanbackLaunchIntentForPackage(MigrationData.CURRENT_PACKAGE);
+        if (open != null) {
+            activity.startActivity(open);
+            return;
+        }
+        busy = true;
+        toast(R.string.update_checking);
+        WORKER.execute(() -> {
+            try {
+                UpdateRelease release = UpdateClient.latest(false);
+                activity.runOnUiThread(() -> {
+                    busy = false;
+                    if (!active()) return;
+                    if (release == null) toast(R.string.update_check_error);
+                    else offer(release);
+                });
+            } catch (Exception error) {
+                activity.runOnUiThread(() -> {
+                    busy = false;
+                    if (active()) toast(R.string.update_check_error);
                 });
             }
         });

@@ -21,8 +21,8 @@ final class UpdateClient {
 
     private UpdateClient() {}
 
-    static UpdateRelease latest() throws Exception {
-        HttpURLConnection connection = open(UpdateRelease.LATEST);
+    static UpdateRelease latest(boolean legacy) throws Exception {
+        HttpURLConnection connection = open(UpdateRelease.manifestUrl(legacy));
         try {
             if (connection.getResponseCode() == 404) return null;
             requireSuccess(connection);
@@ -33,7 +33,7 @@ final class UpdateClient {
                     if (data.size() + n > MAX_MANIFEST_BYTES) throw new IOException("Manifest too large");
                     data.write(buffer, 0, n);
                 }
-                return UpdateRelease.parse(new String(data.toByteArray(), StandardCharsets.UTF_8));
+                return UpdateRelease.parse(new String(data.toByteArray(), StandardCharsets.UTF_8), legacy);
             }
         } finally {
             connection.disconnect();
@@ -85,8 +85,10 @@ final class UpdateClient {
         PackageManager pm = context.getPackageManager();
         PackageInfo installed = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
         PackageInfo candidate = pm.getPackageArchiveInfo(apk.getPath(), PackageManager.GET_SIGNATURES);
-        if (candidate == null || !installed.packageName.equals(candidate.packageName)
-                || candidate.versionCode != release.versionCode || candidate.versionCode <= installed.versionCode
+        String expectedPackage = release.legacy ? MigrationData.LEGACY_PACKAGE : MigrationData.CURRENT_PACKAGE;
+        if (candidate == null || !expectedPackage.equals(candidate.packageName)
+                || candidate.versionCode != release.versionCode
+                || (expectedPackage.equals(installed.packageName) && candidate.versionCode <= installed.versionCode)
                 || !release.versionName.equals(candidate.versionName)
                 || installed.signatures == null || installed.signatures.length == 0
                 || candidate.signatures == null

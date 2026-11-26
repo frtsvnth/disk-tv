@@ -11,6 +11,11 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
         updates = new AppUpdates(this);
         findViewById(R.id.checkUpdates).setOnClickListener(v -> updates.check(true));
+        if (MigrationData.isLegacy()) {
+            android.view.View migration = findViewById(R.id.migrateApp);
+            migration.setVisibility(android.view.View.VISIBLE);
+            migration.setOnClickListener(v -> updates.migrate());
+        }
         findViewById(R.id.settingsBack).setOnClickListener(v -> finish());
         findViewById(R.id.chooseDefaultPlayer).setOnClickListener(v -> PlayerPicker.show(this, null, (option, remember) -> {
             new PlayerPreferences(this).set(option.id);
