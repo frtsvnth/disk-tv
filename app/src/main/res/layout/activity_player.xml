@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg">
+    android:background="@android:color/black">
 
     <androidx.media3.ui.PlayerView
         android:id="@+id/playerView"
@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:use_controller="true"
+        app:shutter_background_color="@android:color/black"
         app:controller_layout_id="@layout/disktv_player_controls"
         app:show_buffering="when_playing"
         app:show_timeout="5000" />
