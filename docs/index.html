@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080c17">
+  <meta name="description" content="Диск ТВ — бесплатный DLNA-плеер для Android TV. Смотрите фильмы с домашнего диска, выбирайте озвучку и продолжайте с места остановки.">
+  <meta property="og:title" content="Диск ТВ — фильмы с вашего диска">
+  <meta property="og:description" content="Смотрите видео с домашнего DLNA-сервера на Android TV. Скачайте APK, установите и откройте свой диск.">
+  <meta property="og:image" content="https://frtsvnth.github.io/disk-tv/assets/disktv-banner.jpg">
+  <meta property="og:url" content="https://frtsvnth.github.io/disk-tv/">
+  <link rel="canonical" href="https://frtsvnth.github.io/disk-tv/">
+  <link rel="icon" type="image/png" href="assets/icon.png">
+  <link rel="stylesheet" href="style.css">
+  <title>Диск ТВ — фильмы с вашего диска</title>
+</head>
+<body>
+  <svg class="symbols" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="download" viewBox="0 0 24 24"><path d="M12 3v12m-4-4 4 4 4-4M4 15v5h16v-5"/></symbol>
+    <symbol id="disk" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M3 13h18M7 17h.01M10 17h.01"/></symbol>
+    <symbol id="captions" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M7 11h3m4 0h3M7 15h10"/></symbol>
+    <symbol id="resume" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8m0-5v5h5m3 1 5 3-5 3Z"/></symbol>
+  </svg>
+  <a class="skip" href="#main">Перейти к содержимому</a>
+  <header class="shell top">
+    <a class="brand" href="./"><img src="assets/icon.png" width="36" height="36" alt="">Диск ТВ</a>
+    <nav aria-label="Навигация">
+      <a href="#features">Возможности</a>
+      <a href="#install">Установка</a>
+      <a href="https://github.com/frtsvnth/disk-tv">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero shell" aria-labelledby="headline">
+      <div class="intro">
+        <p class="eyebrow"><span></span> Android TV и Google TV</p>
+        <h1 id="headline">Фильмы<br>с вашего <em>диска.</em></h1>
+        <p class="lede">Откройте домашний DLNA-сервер и смотрите видео на телевизоре. Выбирайте озвучку и продолжайте с места остановки.</p>
+        <div class="actions">
+          <a class="download" href="https://github.com/frtsvnth/disk-tv/releases/latest/download/DiskTV-New.apk"><svg aria-hidden="true"><use href="#download"/></svg>Скачать APK</a>
+          <a class="how" href="#install">Как установить</a>
+        </div>
+        <p class="compat">Android 8.0 и новее <span>·</span> Бесплатно <span>·</span> Без аккаунта</p>
+      </div>
+      <div class="showcase">
+        <div class="television">
+          <div class="screen">
+            <img src="assets/disktv-banner.jpg" width="1100" height="619" alt="Логотип Диск ТВ: синяя киноплёнка вокруг экрана">
+            <div class="screen-controls" aria-hidden="true">
+              <div class="timeline"><span></span></div>
+              <div class="readout"><span>▶</span><span>12:48</span><span>Звук</span><span>Субтитры</span><span>1×</span></div>
+            </div>
+          </div>
+          <span class="led" aria-hidden="true"></span>
+        </div>
+        <div class="stand" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <section class="shell features" id="features" aria-label="Возможности">
+      <article>
+        <svg aria-hidden="true"><use href="#disk"/></svg>
+        <h2>Ваш диск в сети</h2>
+        <p>Приложение находит DLNA-серверы и показывает папки с видео.</p>
+      </article>
+      <article>
+        <svg aria-hidden="true"><use href="#captions"/></svg>
+        <h2>Управление с пульта</h2>
+        <p>Звук, субтитры и скорость под шкалой. Долгое ОК открывает выбор плеера.</p>
+      </article>
+      <article>
+        <svg aria-hidden="true"><use href="#resume"/></svg>
+        <h2>Помнит, где остановились</h2>
+        <p>Встроенный плеер и Vimu используют общую историю просмотра.</p>
+      </article>
+    </section>
+
+    <section class="shell install" id="install" aria-labelledby="install-title">
+      <div>
+        <p class="eyebrow">Установка</p>
+        <h2 id="install-title">От APK до просмотра</h2>
+        <p>Телевизор и DLNA-сервер должны быть в одной локальной сети.</p>
+        <p class="migration">Уже была старая версия? <a href="https://github.com/frtsvnth/disk-tv#обновления-на-телевизоре">Как перенести историю</a>.</p>
+      </div>
+      <ol>
+        <li><strong>Скачайте APK</strong><p>Возьмите <a href="https://github.com/frtsvnth/disk-tv/releases/latest/download/DiskTV-New.apk">последнюю версию</a> и перенесите файл на телевизор через USB или по сети.</p></li>
+        <li><strong>Откройте файл на телевизоре</strong><p>Запустите APK в файловом менеджере и подтвердите установку. Android может попросить разрешение для этого источника.</p></li>
+        <li><strong>Выберите диск</strong><p>Откройте «Диск ТВ», выберите найденный сервер и запустите видео. О новых версиях приложение сообщит само.</p></li>
+      </ol>
+    </section>
+  </main>
+  <footer class="shell footer">
+    <a class="brand" href="./"><img src="assets/icon.png" width="32" height="32" alt="">Диск ТВ</a>
+    <nav aria-label="Ссылки проекта">
+      <a href="https://github.com/frtsvnth/disk-tv">Исходники</a>
+      <a href="https://github.com/frtsvnth/disk-tv/releases">Релизы</a>
+      <a href="https://github.com/frtsvnth/disk-tv/issues">Сообщить об ошибке</a>
+    </nav>
+  </footer>
+</body>
+</html>

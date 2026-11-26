@@ -14,6 +14,7 @@
 [![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-3DDC84)](app/build.gradle)
 [![MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
+[Сайт проекта](https://frtsvnth.github.io/disk-tv/) ·
 **[Скачать APK последней версии](https://github.com/frtsvnth/disk-tv/releases/latest/download/DiskTV-New.apk)** ·
 [Все релизы](https://github.com/frtsvnth/disk-tv/releases) ·
 [Сообщить о проблеме](https://github.com/frtsvnth/disk-tv/issues)
