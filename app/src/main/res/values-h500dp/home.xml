@@ -1,0 +1,9 @@
+<resources>
+    <dimen name="home_hero_height">94dp</dimen>
+    <dimen name="home_hero_icon">66dp</dimen>
+    <dimen name="home_headline_size">35sp</dimen>
+    <dimen name="home_server_card">146dp</dimen>
+    <dimen name="home_servers_height">154dp</dimen>
+    <dimen name="home_recent_card">82dp</dimen>
+    <dimen name="home_recent_height">90dp</dimen>
+</resources>

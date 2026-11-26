@@ -1,8 +1,12 @@
 <resources>
-    <color name="bg">#090B0F</color><color name="surface">#171A20</color>
-    <color name="text_white">#F3F4F6</color><color name="text_dim">#A2A9B4</color>
-    <color name="text_mid">#818A98</color><color name="text_small">#A2A9B4</color>
-    <color name="glass_start">#23272F</color><color name="glass_end">#14171D</color>
-    <color name="glass_stroke">#343A45</color><color name="border">#303641</color>
-    <color name="accent_cyan">#D4DBE6</color><color name="focus_glow">#E6EAF0</color>
-<color name="logo_background">#030D2B</color></resources>
+    <color name="bg">#080C17</color>
+    <color name="surface">#0F1829</color>
+    <color name="text_white">#F1F5FF</color>
+    <color name="text_dim">#B1BDD2</color>
+    <color name="text_mid">#A0AEC7</color>
+    <color name="border">#23304A</color>
+    <color name="accent_cyan">#A5C9FF</color>
+    <color name="focus_glow">#C5DDFF</color>
+    <color name="accent_ink">#09162E</color>
+    <color name="logo_background">#030D2B</color>
+</resources>

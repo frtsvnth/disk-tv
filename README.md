@@ -222,7 +222,7 @@ SOAP-ошибки, загрузку всех страниц большой па�
 
 ## Лицензия
 
-[MIT](LICENSE). Интерфейс первоначально вдохновлён CleanTV47 / CleanYourTV.
+[MIT](LICENSE).
 Сведения о сторонних компонентах — в [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 
 ---

@@ -18,7 +18,6 @@ import java.util.List;
 
 /**
  * Main screen: lists discovered DLNA MediaServers ("диски в сети") and recent folders.
- * CleanTV47-inspired: black background, glass tiles, D-pad friendly.
  */
 public class MainActivity extends AppCompatActivity implements Discovery.Callback {
 

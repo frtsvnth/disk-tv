@@ -25,14 +25,13 @@
     <string name="unsupported_file">Нет доступного видео для воспроизведения</string>
     <string name="progress_at">Остановились на %1$s</string>
     <string name="resume_body">%1$s\nПродолжить с %2$s?</string>
-    <string name="home_subtitle">Фильмы с вашего диска</string>
+    <string name="home_headline">Фильмы с вашего <font color="#A5C9FF">диска.</font></string>
     <string name="network_drives">Диски в сети</string>
     <string name="refresh">Обновить</string>
     <string name="search_short">Поиск…</string>
     <string name="open">Открыть</string>
     <string name="local_disk">ЛОКАЛЬНАЯ СЕТЬ</string>
     <string name="recent_empty_hint">Открытые папки появятся здесь — к ним можно будет быстро вернуться.</string>
-    <string name="home_remote_hint">ОК — открыть    ·    Стрелки — выбрать</string>
     <string name="network_idle">Локальная сеть</string>
     <string name="resume_question">Продолжить просмотр?</string>
     <string name="stopped_at">Место остановки</string>
