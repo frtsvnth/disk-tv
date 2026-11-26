@@ -18,4 +18,7 @@
     <dimen name="home_servers_height">122dp</dimen>
     <dimen name="home_recent_card">66dp</dimen>
     <dimen name="home_recent_height">74dp</dimen>
+    <dimen name="player_rows_height">156dp</dimen>
+    <dimen name="player_expanded_timeline_margin">212dp</dimen>
+    <dimen name="player_compact_timeline_margin">22dp</dimen>
 </resources>

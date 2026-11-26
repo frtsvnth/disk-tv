@@ -19,6 +19,10 @@ import java.util.*;
 public class PlayerActivity extends AppCompatActivity {
  private ExoPlayer player;
  private PlayerView playerView;
+ private FineTimeBar progressBar;
+ private View playbackRows, playerChrome, bottomBar, controlsScrim;
+ private boolean expandedPanel;
+ private static final int COMPACT_TIMEOUT_MS = 5000;
  private PlaybackPreferences prefs;
  private ResumeStore store;
  private Server server;
@@ -40,31 +44,74 @@ public class PlayerActivity extends AppCompatActivity {
   if(state!=null){playWhenReady=state.getBoolean("playing",true);completed=state.getBoolean("completed");}
   originalDisplayMode=getWindow().getAttributes().preferredDisplayModeId;
   playerView=findViewById(R.id.playerView);
-  FineTimeBar bar=playerView.findViewById(androidx.media3.ui.R.id.exo_progress);
-  if(bar!=null)bar.setBaseIncrement(prefs.seekMs());
+  progressBar = playerView.findViewById(androidx.media3.ui.R.id.exo_progress);
+  progressBar.setBaseIncrement(prefs.seekMs());
   audioRow = findViewById(R.id.audioRow);
   captionRow = findViewById(R.id.captionRow);
   speedRow = findViewById(R.id.speedRow);
-  View rows = findViewById(R.id.playbackRows);
+  playbackRows = findViewById(R.id.playbackRows);
+  playerChrome = findViewById(R.id.playerChrome);
+  bottomBar = playerView.findViewById(androidx.media3.ui.R.id.exo_bottom_bar);
+  controlsScrim = playerView.findViewById(androidx.media3.ui.R.id.exo_controls_background);
+  PlayerControlView controller = playerView.findViewById(androidx.media3.ui.R.id.exo_controller);
+  controller.setAnimationEnabled(false);
   playerView.setControllerVisibilityListener((PlayerView.ControllerVisibilityListener) visibility -> {
-   findViewById(R.id.playerChrome).setVisibility(visibility);
-   rows.setVisibility(visibility);
-   SubtitleView subtitles = playerView.getSubtitleView();
-   if (subtitles != null) {
-    int height = Math.max(playerView.getHeight(), getResources().getDisplayMetrics().heightPixels);
-    float padding = visibility == View.VISIBLE ? Math.min(0.6f, Ui.dp(this, 230) / (float) height) : 0.08f;
-    subtitles.setBottomPaddingFraction(padding);
-   }
+   if (visibility != View.VISIBLE) expandedPanel = false;
+   renderPanel(visibility == View.VISIBLE);
   });
-  rows.getViewTreeObserver().addOnGlobalFocusChangeListener((oldFocus, newFocus) -> {
-   boolean wasInRows = rowForFocus(oldFocus) != null;
-   boolean inRows = rowForFocus(newFocus) != null;
-   if (wasInRows != inRows && newFocus != null) playerView.setControllerShowTimeoutMs(inRows ? 0 : 5000);
+  renderPanel(false);
+  getOnBackPressedDispatcher().addCallback(this, new androidx.activity.OnBackPressedCallback(true) {
+   @Override public void handleOnBackPressed() {
+    if (expandedPanel) collapsePanel();
+    else {
+     setEnabled(false);
+     getOnBackPressedDispatcher().onBackPressed();
+    }
+   }
   });
   ((TextView)findViewById(R.id.playingTitle)).setText(item.title);
   playerView.findViewById(R.id.playerMore).setOnClickListener(v -> showOptions());
   playerView.requestFocus();
  }
+
+ private void renderPanel(boolean controlsVisible) {
+  boolean showRows = controlsVisible && expandedPanel;
+  playbackRows.setVisibility(showRows ? View.VISIBLE : View.GONE);
+  playerChrome.setVisibility(showRows ? View.VISIBLE : View.GONE);
+  bottomBar.setVisibility(showRows ? View.VISIBLE : View.GONE);
+  controlsScrim.setBackgroundResource(showRows ? androidx.media3.ui.R.color.exo_black_opacity_60
+    : R.drawable.player_timeline_scrim);
+  android.widget.FrameLayout.LayoutParams layout = (android.widget.FrameLayout.LayoutParams) progressBar.getLayoutParams();
+  int margin = getResources().getDimensionPixelSize(showRows
+    ? R.dimen.player_expanded_timeline_margin : R.dimen.player_compact_timeline_margin);
+  if (layout.bottomMargin != margin) {
+   layout.bottomMargin = margin;
+   progressBar.setLayoutParams(layout);
+  }
+  SubtitleView subtitles = playerView.getSubtitleView();
+  if (subtitles != null) {
+   int height = Math.max(playerView.getHeight(), getResources().getDisplayMetrics().heightPixels);
+   float padding = controlsVisible ? Math.max(0.08f, Math.min(0.6f, (margin + Ui.dp(this, 18)) / (float) height)) : 0.08f;
+   subtitles.setBottomPaddingFraction(padding);
+  }
+ }
+
+ private void expandPanel() {
+  expandedPanel = true;
+  playerView.setControllerShowTimeoutMs(0);
+  playerView.showController();
+  renderPanel(true);
+  audioRow.focusActive();
+ }
+
+ private void collapsePanel() {
+  expandedPanel = false;
+  playerView.setControllerShowTimeoutMs(COMPACT_TIMEOUT_MS);
+  playerView.showController();
+  renderPanel(true);
+  progressBar.requestFocus();
+ }
+
  @Override protected void onStart(){
   super.onStart();if(isFinishing()||item==null||playerView==null)return;
   DefaultLoadControl load=new DefaultLoadControl.Builder().setBufferDurationsMs(15000,60000,1000,2500)
@@ -100,6 +147,7 @@ public class PlayerActivity extends AppCompatActivity {
   }
   media.setSubtitleConfigurations(subtitles);
   player.setMediaItem(media.build());player.seekTo(position);player.prepare();player.setPlayWhenReady(playWhenReady&&!completed);
+  collapsePanel();
   handler.postDelayed(saver,5000);
  }
  private void configureAutomaticSubtitles(TrackSelectionParameters.Builder builder) {
@@ -294,31 +342,54 @@ public class PlayerActivity extends AppCompatActivity {
  }
  @Override protected void onDestroy(){if(dialog!=null)dialog.dismiss();super.onDestroy();}
  @Override protected void onSaveInstanceState(Bundle state){state.putLong("position",player==null?position:player.getCurrentPosition());state.putBoolean("playing",player==null?playWhenReady:player.getPlayWhenReady());state.putBoolean("completed",completed);super.onSaveInstanceState(state);}
- @Override public boolean dispatchKeyEvent(KeyEvent event){
-  if(event.getKeyCode()==KeyEvent.KEYCODE_MENU){if(event.getAction()==KeyEvent.ACTION_DOWN&&event.getRepeatCount()==0)showOptions();return true;}
-  if (playerView != null && event.getAction() == KeyEvent.ACTION_DOWN) {
-   int key = event.getKeyCode();
+ @Override public boolean dispatchKeyEvent(KeyEvent event) {
+  int key = event.getKeyCode();
+  if (key == KeyEvent.KEYCODE_MENU) {
+   if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) showOptions();
+   return true;
+  }
+  if (playerView == null || player == null) return super.dispatchKeyEvent(event);
+  if (event.getAction() == KeyEvent.ACTION_DOWN) {
    View focus = getCurrentFocus();
    PlaybackChoiceRow row = rowForFocus(focus);
    View playPause = playerView.findViewById(androidx.media3.ui.R.id.exo_play_pause);
-   View progressBar = playerView.findViewById(androidx.media3.ui.R.id.exo_progress);
+   View more = playerView.findViewById(R.id.playerMore);
    if (key == KeyEvent.KEYCODE_DPAD_DOWN) {
-    if (!playerView.isControllerFullyVisible()) {
-     playerView.showController();
-     progressBar.requestFocus();
-     return true;
-    }
-    if (focus == playPause || focus == playerView.findViewById(R.id.playerMore)) {
-     return audioRow.focusActive();
-    }
-    if (row == audioRow) return captionRow.focusActive();
-    if (row == captionRow) return speedRow.focusActive();
-    if (row == speedRow) return true;
+    if (event.getRepeatCount() != 0) return true;
+    if (!expandedPanel) expandPanel();
+    else if (focus == progressBar) playPause.requestFocus();
+    else if (row == audioRow) captionRow.focusActive();
+    else if (row == captionRow) speedRow.focusActive();
+    else if (row != speedRow) audioRow.focusActive();
+    return true;
    }
-   if (key == KeyEvent.KEYCODE_DPAD_UP) {
-    if (row == speedRow) return captionRow.focusActive();
-    if (row == captionRow) return audioRow.focusActive();
-    if (row == audioRow) return playPause.requestFocus();
+   if (key == KeyEvent.KEYCODE_DPAD_UP && expandedPanel) {
+    if (event.getRepeatCount() != 0) return true;
+    if (row == speedRow) captionRow.focusActive();
+    else if (row == captionRow) audioRow.focusActive();
+    else if (row == audioRow) playPause.requestFocus();
+    else if (focus == playPause || focus == more) progressBar.requestFocus();
+    else collapsePanel();
+    return true;
+   }
+   if (!expandedPanel && (key == KeyEvent.KEYCODE_DPAD_LEFT || key == KeyEvent.KEYCODE_DPAD_RIGHT)) {
+    if (!playerView.isControllerFullyVisible() || focus != progressBar) collapsePanel();
+    if (progressBar.isFocused()) {
+     playerView.showController();
+     return progressBar.onKeyDown(key, event);
+    }
+   }
+   if (!expandedPanel && (key == KeyEvent.KEYCODE_DPAD_CENTER || key == KeyEvent.KEYCODE_ENTER)) {
+    if (event.getRepeatCount() == 0) {
+     boolean committedSeek = playerView.isControllerFullyVisible()
+       && progressBar.isFocused() && progressBar.onKeyDown(key, event);
+     if (!committedSeek) {
+      if (player.getPlayWhenReady()) player.pause();
+      else player.play();
+     }
+     collapsePanel();
+    }
+    return true;
    }
   }
   return super.dispatchKeyEvent(event);
