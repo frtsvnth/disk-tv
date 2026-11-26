@@ -5,9 +5,12 @@ import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class SettingsActivity extends AppCompatActivity {
+    private AppUpdates updates;
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_settings);
+        updates = new AppUpdates(this, state);
+        findViewById(R.id.checkUpdates).setOnClickListener(v -> updates.check(true));
         findViewById(R.id.settingsBack).setOnClickListener(v -> finish());
         findViewById(R.id.chooseDefaultPlayer).setOnClickListener(v -> PlayerPicker.show(this, null, (option, remember) -> {
             new PlayerPreferences(this).set(option.id);
@@ -29,6 +32,11 @@ public class SettingsActivity extends AppCompatActivity {
         configurePlayback();
         findViewById(R.id.chooseDefaultPlayer).requestFocus();
     }
+    @Override protected void onSaveInstanceState(Bundle state) {
+        updates.saveState(state);
+        super.onSaveInstanceState(state);
+    }
+
     @Override protected void onResume() { super.onResume(); updatePlayer(); }
     private void updatePlayer() {
         SortPreferences sort = new SortPreferences(this);
@@ -37,8 +45,8 @@ public class SettingsActivity extends AppCompatActivity {
         ((TextView)findViewById(R.id.sortFolders)).setText(sort.foldersFirst()?"Папки сначала: да":"Папки сначала: нет");
         ((TextView) findViewById(R.id.currentPlayer)).setText(PlayerResolver.preferredLabel(this));
         PlaybackPreferences p=new PlaybackPreferences(this);
-        ((TextView)findViewById(R.id.audioLanguage)).setText("Язык аудио: "+languageLabel(p.string("audio_language","system")));
-        ((TextView)findViewById(R.id.subtitleLanguage)).setText("Субтитры по умолчанию: "+languageLabel(p.string("subtitle_language","off")));
+        ((TextView)findViewById(R.id.audioLanguage)).setText("Язык аудио: "+languageLabel(p.string("audio_language","ru")));
+        ((TextView)findViewById(R.id.subtitleLanguage)).setText("Субтитры по умолчанию: "+languageLabel(p.string("subtitle_language","forced")));
         ((TextView)findViewById(R.id.subtitleSize)).setText("Размер субтитров: "+p.subtitleSize());
         ((TextView)findViewById(R.id.subtitleStyle)).setText("Оформление субтитров: "+p.string("subtitle_style","original").replace("original","из файла").replace("white","белый").replace("yellow","жёлтый"));
         ((TextView)findViewById(R.id.seekStep)).setText("Шаг перемотки: "+(p.seekMs()/1000)+" с");
@@ -47,13 +55,14 @@ public class SettingsActivity extends AppCompatActivity {
         ((TextView)findViewById(R.id.frameMatching)).setText("Подстройка частоты кадров: "+(p.bool("frame_match",false)?"вкл":"выкл"));
     }
     private String languageLabel(String value){
+        if (value.equals("forced")) return "Только форсированные";
         if(value.equals("off"))return "выключены";
         if(value.equals("system"))return "как в Android";
         return java.util.Locale.forLanguageTag(value).getDisplayLanguage();
     }
     private void configurePlayback(){
-        stringChoice(R.id.audioLanguage,"Язык аудиодорожки",new String[]{"Как в Android","Русский","Английский","Украинский","Японский","Немецкий","Французский"},new String[]{"system","ru","en","uk","ja","de","fr"},"audio_language","system");
-        stringChoice(R.id.subtitleLanguage,"Субтитры по умолчанию",new String[]{"Выключены","Как в Android","Русский","Английский","Украинский","Японский","Немецкий","Французский"},new String[]{"off","system","ru","en","uk","ja","de","fr"},"subtitle_language","off");
+        stringChoice(R.id.audioLanguage,"Язык аудиодорожки",new String[]{"Как в Android","Русский","Английский","Украинский","Японский","Немецкий","Французский"},new String[]{"system","ru","en","uk","ja","de","fr"},"audio_language","ru");
+        stringChoice(R.id.subtitleLanguage,"Субтитры по умолчанию",new String[]{"Только форсированные","Выключены","Как в Android","Русский","Английский","Украинский","Японский","Немецкий","Французский"},new String[]{"forced","off","system","ru","en","uk","ja","de","fr"},"subtitle_language","forced");
         stringChoice(R.id.subtitleStyle,"Оформление субтитров",new String[]{"Стили из файла","Белый с обводкой","Жёлтый с обводкой"},new String[]{"original","white","yellow"},"subtitle_style","original");
         stringChoice(R.id.aspectMode,"Масштаб изображения",new String[]{"Вписать целиком","Приблизить с обрезкой","Растянуть"},new String[]{"fit","zoom","fill"},"aspect","fit");
         intChoice(R.id.subtitleSize,"Размер субтитров",new String[]{"Мелкие","Обычные","Крупные","Очень крупные"},new int[]{18,22,28,34},"subtitle_size",22);

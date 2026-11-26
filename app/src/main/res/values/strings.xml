@@ -55,6 +55,26 @@
     <string name="unavailable_player">Плеер недоступен</string>
     <string name="player_unavailable_hint">Этот плеер не может открыть файл. Выберите другой.</string>
     <string name="default_player_hint">Обычное нажатие ОК запускает выбранный плеер. Удерживайте ОК на видео, чтобы открыть его в другом.</string>
-    <string name="external_progress_hint">Внешние плееры сохраняют позицию просмотра по своим правилам. Прогресс встроенного плеера остаётся в «Диск ТВ».</string>
+    <string name="external_progress_hint">Встроенный плеер и Vimu используют общую историю. Для других плееров можно поставить отметку о просмотре из меню фильма.</string>
     <string name="browser_remote_hint">ОК — открыть    ·    Удерживайте ОК на видео — выбрать плеер</string>
+    <string name="player_audio">Звук</string>
+    <string name="player_captions">Субтитры</string>
+    <string name="player_more">Ещё</string>
+    <string name="watched">Просмотрено</string>
+    <string name="mark_watched">Отметить просмотренным</string>
+    <string name="mark_unwatched">Снять отметку о просмотре</string>
+    <string name="update_check">Проверить обновления</string>
+    <string name="update_checking">Проверяем обновления…</string>
+    <string name="update_available">Доступен «Диск ТВ» %1$s</string>
+    <string name="update_confirm">Скачать обновление из GitHub и открыть установщик Android?</string>
+    <string name="update_install">Обновить</string>
+    <string name="update_later">Позже</string>
+    <string name="update_current">Установлена последняя версия</string>
+    <string name="update_check_error">Не удалось проверить обновления. Попробуйте позже.</string>
+    <string name="update_downloading">Скачиваем обновление…</string>
+    <string name="update_download_error">Не удалось скачать или проверить обновление.</string>
+    <string name="update_permission_title">Разрешите установку обновления</string>
+    <string name="update_permission_hint">В настройках Android разрешите установку приложений из «Диск ТВ», затем вернитесь сюда.</string>
+    <string name="update_open_settings">Открыть настройки</string>
+    <string name="update_installer_error">Android не смог открыть установщик.</string>
 </resources>

@@ -34,6 +34,9 @@ import java.util.List;
 public class BrowserActivity extends AppCompatActivity implements UpnpClient.Callback {
 
 
+    private static final int VIMU_PLAYBACK_REQUEST = 121;
+    private DmsItem pendingVimuItem;
+    private String pendingVimuPackage;
     private Server server;
     private String objectId;
     private String path;
@@ -51,6 +54,10 @@ public class BrowserActivity extends AppCompatActivity implements UpnpClient.Cal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_browser);
+        if (savedInstanceState != null) {
+            pendingVimuItem = (DmsItem) savedInstanceState.getSerializable("vimuItem");
+            pendingVimuPackage = savedInstanceState.getString("vimuPackage");
+        }
 
         server = (Server) getIntent().getSerializableExtra("server");
         objectId = getIntent().getStringExtra("objectId");
@@ -152,7 +159,7 @@ public class BrowserActivity extends AppCompatActivity implements UpnpClient.Cal
             if (PlayerPreferences.INTERNAL.equals(preferred)) playInternal(item);
             else {
                 PlayerResolver.Option option = PlayerResolver.find(this, item, preferred);
-                if (option == null || !PlayerResolver.launch(this, item, option)) {
+                if (option == null || !playExternal(item, option)) {
                     Toast.makeText(this, R.string.player_unavailable_hint, Toast.LENGTH_LONG).show();
                     choosePlayer(item);
                 }
@@ -178,28 +185,93 @@ public class BrowserActivity extends AppCompatActivity implements UpnpClient.Cal
     }
 
     private void choosePlayer(DmsItem item) {
+        ResumeStore history = new ResumeStore(this);
+        boolean watched = history.isWatched(server.udn, item.objectId);
         PlayerPicker.show(this, item, (option, remember) -> {
             if (option.internal()) {
                 if (remember) new PlayerPreferences(this).set(option.id);
                 playInternal(item);
-            } else if (PlayerResolver.launch(this, item, option)) {
+            } else if (playExternal(item, option)) {
                 if (remember) new PlayerPreferences(this).set(option.id);
             } else {
                 Toast.makeText(this, R.string.player_unavailable_hint, Toast.LENGTH_LONG).show();
                 choosePlayer(item);
             }
+        }, watched ? R.string.mark_unwatched : R.string.mark_watched, () -> {
+            history.setWatched(server.udn, item.objectId, !watched);
+            int position = items.indexOf(item);
+            if (position >= 0) adapter.notifyItemChanged(position);
         });
     }
 
     private void playInternal(DmsItem item) {
         ResumeStore.ResumeEntry entry = new ResumeStore(this).load(server.udn, item.objectId);
-        if (entry != null && entry.hasResume()) showResumeDialog(item, entry);
+        if (entry != null && entry.hasResume()) showResumeDialog(item, entry, ms -> play(item, ms));
         else play(item, 0);
+    }
+
+    private boolean playExternal(DmsItem item, PlayerResolver.Option option) {
+        String target = option.component.getPackageName();
+        if (!target.equals("net.gtvbox.videoplayer") && !target.equals("net.gtvbox.vimuhd")) {
+            return PlayerResolver.launch(this, item, option);
+        }
+        ResumeStore.ResumeEntry entry = new ResumeStore(this).load(server.udn, item.objectId);
+        if (entry != null && entry.hasResume()) {
+            showResumeDialog(item, entry, ms -> launchVimu(item, option, ms));
+            return true;
+        }
+        return launchVimu(item, option, 0);
+    }
+
+    private boolean launchVimu(DmsItem item, PlayerResolver.Option option, long startMs) {
+        Intent intent = PlayerResolver.videoIntent(item).setComponent(option.component)
+                .putExtra("forcename", item.title)
+                .putExtra("startfrom", (int) Math.min(Integer.MAX_VALUE, startMs));
+        pendingVimuItem = item;
+        pendingVimuPackage = option.component.getPackageName();
+        try {
+            startActivityForResult(intent, VIMU_PLAYBACK_REQUEST);
+            return true;
+        } catch (android.content.ActivityNotFoundException | SecurityException error) {
+            pendingVimuItem = null;
+            pendingVimuPackage = null;
+            Toast.makeText(this, R.string.player_unavailable_hint, Toast.LENGTH_LONG).show();
+            return false;
+        }
+    }
+
+    @Override protected void onSaveInstanceState(Bundle state) {
+        state.putSerializable("vimuItem", pendingVimuItem);
+        state.putString("vimuPackage", pendingVimuPackage);
+        super.onSaveInstanceState(state);
+    }
+
+    @Override protected void onActivityResult(int request, int result, Intent data) {
+        super.onActivityResult(request, result, data);
+        if (request != VIMU_PLAYBACK_REQUEST) return;
+        DmsItem item = pendingVimuItem;
+        String source = pendingVimuPackage;
+        pendingVimuItem = null;
+        pendingVimuPackage = null;
+        if (item == null || server == null || source == null || data == null) return;
+        String action = data.getAction();
+        if (!"net.gtvbox.videoplayer.result".equals(action) && !(source + ".result").equals(action)) return;
+
+        ResumeStore history = new ResumeStore(this);
+        if (result == 1) {
+            history.setWatched(server.udn, item.objectId, true);
+        } else if (result == 0) {
+            long position = data.getIntExtra("position", -1);
+            long duration = data.getIntExtra("duration", -1);
+            if (position > 1000 && (duration <= 0 || position <= duration)) {
+                history.save(server.udn, item.objectId, item.title, item.url, position, duration);
+            }
+        }
     }
 
     private void goUp() { finish(); }
 
-    private void showResumeDialog(DmsItem item, ResumeStore.ResumeEntry entry) {
+    private void showResumeDialog(DmsItem item, ResumeStore.ResumeEntry entry, java.util.function.LongConsumer start) {
         Dialog d = new Dialog(this);
         d.requestWindowFeature(Window.FEATURE_NO_TITLE);
         d.setContentView(R.layout.dialog_resume);
@@ -217,11 +289,11 @@ public class BrowserActivity extends AppCompatActivity implements UpnpClient.Cal
 
         btnResume.setOnClickListener(v -> {
             d.dismiss();
-            play(item, entry.positionMs);
+            start.accept(entry.positionMs);
         });
         btnStart.setOnClickListener(v -> {
             d.dismiss();
-            play(item, 0);
+            start.accept(0);
         });
 
         d.show();
@@ -276,8 +348,10 @@ public class BrowserActivity extends AppCompatActivity implements UpnpClient.Cal
             h.subtitle.setText(Ui.fileInfo(ctx, it));
             ResumeStore.ResumeEntry progress = it.isFolder ? null : resume.load(serverId, it.objectId);
             boolean resumable = progress != null && progress.hasResume();
-            h.status.setVisibility(resumable ? View.VISIBLE : View.GONE);
+            boolean watched = !it.isFolder && resume.isWatched(serverId, it.objectId);
+            h.status.setVisibility(resumable || watched ? View.VISIBLE : View.GONE);
             if (resumable) h.status.setText(Ui.time(progress.positionMs));
+            else if (watched) h.status.setText(R.string.watched);
             boolean showProgress = resumable && progress.durationMs > 0;
             h.progress.setVisibility(showProgress ? View.VISIBLE : View.GONE);
             if (showProgress) h.progress.setProgress((int) Math.min(1000, progress.positionMs * 1000 / progress.durationMs));

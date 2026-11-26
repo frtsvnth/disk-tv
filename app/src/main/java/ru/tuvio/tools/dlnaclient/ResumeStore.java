@@ -32,6 +32,16 @@ public class ResumeStore {
                     value.getLong("pos"), value.optLong("dur", -1));
         } catch (Exception e) { return null; }
     }
+    public boolean isWatched(String server, String id) {
+        return prefs.getBoolean("watched:" + entryKey(server, id), false);
+    }
+    public void setWatched(String server, String id, boolean watched) {
+        String key = entryKey(server, id);
+        SharedPreferences.Editor edit = prefs.edit();
+        if (watched) edit.putBoolean("watched:" + key, true).remove(key);
+        else edit.remove("watched:" + key);
+        edit.apply();
+    }
     public void remove(String server, String id) {
         prefs.edit().remove(entryKey(server, id)).apply();
     }

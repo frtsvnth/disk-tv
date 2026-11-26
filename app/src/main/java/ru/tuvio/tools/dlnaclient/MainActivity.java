@@ -22,6 +22,7 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatActivity implements Discovery.Callback {
 
+    private AppUpdates updates;
     private Discovery discovery;
     private ServerAdapter serverAdapter;
     private RecentAdapter recentAdapter;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements Discovery.Callbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        updates = new AppUpdates(this, savedInstanceState);
 
 
         serversList = findViewById(R.id.serversList);
@@ -71,6 +73,11 @@ public class MainActivity extends AppCompatActivity implements Discovery.Callbac
     protected void onDestroy() {
         super.onDestroy();
         if (discovery != null) discovery.stop();
+    }
+
+    @Override protected void onSaveInstanceState(Bundle state) {
+        updates.saveState(state);
+        super.onSaveInstanceState(state);
     }
 
     private void startDiscovery() {
@@ -145,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements Discovery.Callbac
     @Override
     protected void onResume() {
         super.onResume();
+        updates.check(false);
         loadRecents();
     }
 

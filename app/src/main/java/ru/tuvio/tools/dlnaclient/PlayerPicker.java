@@ -12,6 +12,10 @@ import java.util.List;
 final class PlayerPicker {
     interface Listener { void onSelected(PlayerResolver.Option player, boolean remember); }
     static void show(AppCompatActivity activity, DmsItem item, Listener listener) {
+        show(activity, item, listener, 0, null);
+    }
+    static void show(AppCompatActivity activity, DmsItem item, Listener listener,
+                     int historyLabel, Runnable historyAction) {
         List<PlayerResolver.Option> options = PlayerResolver.list(activity, item);
         String preferred = new PlayerPreferences(activity).get();
         Dialog dialog = new Dialog(activity);
@@ -21,6 +25,15 @@ final class PlayerPicker {
         ((TextView) dialog.findViewById(R.id.pickerSubtitle)).setText(item == null ? activity.getString(R.string.compatible_players) : item.title);
         CheckBox remember = dialog.findViewById(R.id.rememberPlayer);
         remember.setVisibility(item == null ? View.GONE : View.VISIBLE);
+        Button history = dialog.findViewById(R.id.toggleWatched);
+        history.setVisibility(historyAction == null ? View.GONE : View.VISIBLE);
+        if (historyAction != null) {
+            history.setText(historyLabel);
+            history.setOnClickListener(v -> {
+                dialog.dismiss();
+                historyAction.run();
+            });
+        }
         RecyclerView list = dialog.findViewById(R.id.playerOptions);
         list.setLayoutManager(new LinearLayoutManager(activity));
         list.setAdapter(new RecyclerView.Adapter<Holder>() {
@@ -44,7 +57,7 @@ final class PlayerPicker {
             @Override public int getItemCount() { return options.size(); }
         });
         ViewGroup.LayoutParams params = list.getLayoutParams();
-        int maxHeight = activity.getResources().getDisplayMetrics().heightPixels - Ui.dp(activity, item == null ? 190 : 238);
+        int maxHeight = activity.getResources().getDisplayMetrics().heightPixels - Ui.dp(activity, item == null ? 190 : historyAction == null ? 238 : 288);
         params.height = Math.max(Ui.dp(activity, 64), Math.min(Ui.dp(activity, options.size() * 69 + 8), maxHeight));
         list.setLayoutParams(params);
         dialog.show();

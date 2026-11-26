@@ -16,6 +16,17 @@ public class StoreTest {
         assertEquals("Фильм \"А\\Б\"\n2026", e.title); assertEquals(45000, e.positionMs); assertTrue(e.hasResume());
         s.remove("uuid:nas", "42"); assertNull(s.load("uuid:nas", "42"));
     }
+    @Test public void watchedStatusPersistsAndRemovesObsoleteResume() {
+        ResumeStore store = new ResumeStore(prefs);
+        store.save("nas", "42", "Film", "http://nas/movie", 45000, 180000);
+        store.setWatched("nas", "42", true);
+        ResumeStore reopened = new ResumeStore(prefs);
+        assertTrue(reopened.isWatched("nas", "42"));
+        assertFalse(reopened.isWatched("other-nas", "42"));
+        assertNull(reopened.load("nas", "42"));
+        reopened.setWatched("nas", "42", false);
+        assertFalse(store.isWatched("nas", "42"));
+    }
     @Test public void unknownDurationAllowsResumeAndNearEndDoesNot() {
         assertTrue(new ResumeStore.ResumeEntry("", "", 10000, -1).hasResume());
         assertFalse(new ResumeStore.ResumeEntry("", "", 98000, 100000).hasResume());
