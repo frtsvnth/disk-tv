@@ -9,7 +9,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.activity_settings);
-        updates = new AppUpdates(this, state);
+        updates = new AppUpdates(this);
         findViewById(R.id.checkUpdates).setOnClickListener(v -> updates.check(true));
         findViewById(R.id.settingsBack).setOnClickListener(v -> finish());
         findViewById(R.id.chooseDefaultPlayer).setOnClickListener(v -> PlayerPicker.show(this, null, (option, remember) -> {
@@ -32,11 +32,6 @@ public class SettingsActivity extends AppCompatActivity {
         configurePlayback();
         findViewById(R.id.chooseDefaultPlayer).requestFocus();
     }
-    @Override protected void onSaveInstanceState(Bundle state) {
-        updates.saveState(state);
-        super.onSaveInstanceState(state);
-    }
-
     @Override protected void onResume() { super.onResume(); updatePlayer(); }
     private void updatePlayer() {
         SortPreferences sort = new SortPreferences(this);

@@ -73,8 +73,5 @@
     <string name="update_check_error">Не удалось проверить обновления. Попробуйте позже.</string>
     <string name="update_downloading">Скачиваем обновление…</string>
     <string name="update_download_error">Не удалось скачать или проверить обновление.</string>
-    <string name="update_permission_title">Разрешите установку обновления</string>
-    <string name="update_permission_hint">В настройках Android разрешите установку приложений из «Диск ТВ», затем вернитесь сюда.</string>
-    <string name="update_open_settings">Открыть настройки</string>
     <string name="update_installer_error">Android не смог открыть установщик.</string>
 </resources>

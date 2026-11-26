@@ -5,12 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
-import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
@@ -21,41 +17,23 @@ import java.util.concurrent.Executors;
 
 final class AppUpdates {
     private static final String TAG = "DiskTV/Updates";
-    private static final String PENDING_APK = "pendingUpdateApk";
     private static final long CHECK_INTERVAL_MS = 30L * 60 * 1000;
     private static final long SNOOZE_MS = 24L * 60 * 60 * 1000;
     private static final ExecutorService WORKER = Executors.newSingleThreadExecutor();
 
     private final AppCompatActivity activity;
     private final SharedPreferences preferences;
-    private final ActivityResultLauncher<Intent> sourcesSettings;
-    private File pendingApk;
     private boolean busy;
 
-    AppUpdates(AppCompatActivity activity, Bundle state) {
+    AppUpdates(AppCompatActivity activity) {
         this.activity = activity;
         preferences = activity.getSharedPreferences("updates", Context.MODE_PRIVATE);
-        if (state != null) {
-            String fileName = state.getString(PENDING_APK);
-            if (fileName != null && fileName.matches("update-[0-9]+[.]apk")) {
-                pendingApk = new File(new File(activity.getCacheDir(), "updates"), fileName);
-            }
-        }
-        sourcesSettings = activity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-            File ready = pendingApk;
-            pendingApk = null;
-            if (ready != null && activity.getPackageManager().canRequestPackageInstalls()) openInstaller(ready);
-        });
-    }
-
-    void saveState(Bundle state) {
-        if (pendingApk != null) state.putString(PENDING_APK, pendingApk.getName());
     }
 
     void check(boolean manual) {
         long now = System.currentTimeMillis();
         long elapsed = now - preferences.getLong("lastCheck", 0);
-        if (busy || pendingApk != null || (!manual && elapsed >= 0 && elapsed < CHECK_INTERVAL_MS)) return;
+        if (busy || (!manual && elapsed >= 0 && elapsed < CHECK_INTERVAL_MS)) return;
         busy = true;
         preferences.edit().putLong("lastCheck", now).apply();
         if (manual) toast(R.string.update_checking);
@@ -124,28 +102,9 @@ final class AppUpdates {
                 progress.dismiss();
                 if (!active()) return;
                 if (apk == null) toast(R.string.update_download_error);
-                else if (activity.getPackageManager().canRequestPackageInstalls()) openInstaller(apk);
-                else requestInstallPermission(apk);
+                else openInstaller(apk);
             });
         });
-    }
-
-    private void requestInstallPermission(File apk) {
-        new AlertDialog.Builder(activity)
-                .setTitle(R.string.update_permission_title)
-                .setMessage(R.string.update_permission_hint)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(R.string.update_open_settings, (dialog, which) -> {
-                    pendingApk = apk;
-                    Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                            Uri.parse("package:" + activity.getPackageName()));
-                    try {
-                        sourcesSettings.launch(intent);
-                    } catch (ActivityNotFoundException | SecurityException error) {
-                        pendingApk = null;
-                        toast(R.string.update_installer_error);
-                    }
-                }).show();
     }
 
     @SuppressWarnings("deprecation")

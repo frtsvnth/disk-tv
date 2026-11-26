@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements Discovery.Callbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        updates = new AppUpdates(this, savedInstanceState);
+        updates = new AppUpdates(this);
 
 
         serversList = findViewById(R.id.serversList);
@@ -73,11 +73,6 @@ public class MainActivity extends AppCompatActivity implements Discovery.Callbac
     protected void onDestroy() {
         super.onDestroy();
         if (discovery != null) discovery.stop();
-    }
-
-    @Override protected void onSaveInstanceState(Bundle state) {
-        updates.saveState(state);
-        super.onSaveInstanceState(state);
     }
 
     private void startDiscovery() {
